@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Minha Aplicação SPA</title>
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+    <style>
+        /* Estilo básico para o menu */
+        nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
+        nav a { margin-right: 15px; font-weight: bold; text-decoration: none; color: #007bff; }
+        nav a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <!-- Menu de Navegação -->
+    <nav>
+        <a href="#home">Início</a>
+        <a href="#professores">Professores</a>
+        <a href="#faculdades">Faculdades</a>
+    </nav>
+
+    <!-- Container onde as telas serão renderizadas -->
+    <main id="app-container">
+        <!-- O conteúdo será injetado aqui pelo JavaScript -->
+    </main>
+
+    <!-- TEMPLATES DAS TELAS (Ficam ocultos até serem clonados) -->
+    
+    <!-- Template: Home -->
+    <template id="tpl-home">
+        <h1>Bem-vindo ao Sistema</h1>
+        <p>Selecione uma opção no menu acima para começar.</p>
+    </template>
+
+    <!-- Template: Professores (Baseado no seu professores.html) -->
+    <template id="tpl-professores">
+        <h1>Gerenciamento de Professores</h1>
+        
+        <table id="tabelaFormulario" style="display:none;">    
+            <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+            <tr> <td>Nome:</td> <td><input type="text" id="txtNome"></td> </tr>
+            <tr> <td>Matrícula:</td> <td><input type="text" id="txtMatricula"></td> </tr>
+            <tr> <td>Área:</td> <td><input type="text" id="txtArea"></td> </tr> 
+            <tr><td></td><td>
+                <input type="button" value="Salvar" onclick="salvarProfessor()" id="btnSalvar">
+                <input type="button" value="Apagar" onclick="apagarProfessor()" id="btnApagar">
+                <input type="button" value="Cancelar" onclick="cancelarEdicao()" id="btnCancelar">
+            </td></tr>
+        </table> 
+        
+        <p style="font-weight:bold" id="paragrafoMensagem"></p>
+        
+        <table id="tabelaProfessores">  
+            <tr><td><input type="button" value="Novo" onclick="novoProfessor()" id="btnNovo"></td> <td></td> <td></td></tr>
+            <tr> <th>ID</th> <th>Nome</th> <th>Matrícula</th> <th>Área</th> </tr>
+            <tbody id="corpoTabelaProfessores"> </tbody>
+        </table>
+    </template>
+
+    <!-- Template: Faculdades (Exemplo) -->
+    <template id="tpl-faculdades">
+        <h1>Gerenciamento de Faculdades</h1>
+        <p>Aqui entraria a lógica de faculdades similar à de professores.</p>
+    </template>
+
+    <!-- Scripts -->
+    <script src="rest.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

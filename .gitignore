@@ -1,0 +1,21 @@
+cat > .gitignore << 'EOF'
+# Arquivos do Maven / Java
+target/
+*.class
+*.jar
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Node (se você usar SPA)
+node_modules/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+EOF
