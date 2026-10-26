@@ -28,6 +28,7 @@ Com o Codespace aberto (VS Code no navegador), abra o terminal (`Ctrl + '`) e ex
 
 ```bash
 mvn spring-boot:run
+``` 
 
 # mvn: command not found
 Causa: A imagem base do Java no Codespace não vem com o Maven instalado por padrão.
@@ -35,6 +36,8 @@ Solução Rápida: Instale o Maven na sessão atual rodando:
 
 ```bash
 source /usr/local/sdkman/bin/sdkman-init.sh && sdk install maven
+```
+
 Solução Definitiva: Adicione a configuração de instalação do Maven no arquivo .devcontainer/devcontainer.json e faça um Rebuild Container.
 
 
@@ -54,7 +57,8 @@ Solução: Certifique-se de que a pasta .devcontainer contém os dois arquivos: 
 Causa: O Spring Boot não consegue achar o PostgreSQL.
 Solução: Verifique o arquivo src/main/resources/application.properties. A URL de conexão não deve ser localhost, deve apontar para o nome do serviço no Docker Compose:
 
-properties
+```properties
 spring.datasource.url=jdbc:postgresql://db:5432/meubanco
 spring.datasource.username=postgres
 spring.datasource.password=postgres
+``` 
