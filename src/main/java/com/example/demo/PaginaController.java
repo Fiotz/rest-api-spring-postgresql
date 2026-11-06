@@ -16,4 +16,10 @@ public class PaginaController {
         // O "forward:" diz para o Spring pegar a requisição e entregar o arquivo estático
         return "forward:/faculdade.html";
     }
+    
+    @GetMapping("/disciplinas")
+    public String paginaDisciplinas() {
+        // O "forward:" diz para o Spring pegar a requisição e entregar o arquivo estático
+        return "forward:/disciplinas.html";
+    }
 }

@@ -28,6 +28,10 @@
             <td><input type="text" id="txtArea"></td>
         </tr>
         <tr>
+            <td>Faculdade:</td>
+            <td><select id="selectFaculdade"></select></td>
+        </tr>
+        <tr>
             <td></td>
             <td>
                 <input type="button" value="Novo" onclick="novoProfessor()" id="btnNovo">
@@ -58,6 +62,7 @@
         const txtMatricula = document.querySelector('#txtMatricula');
         const txtArea = document.querySelector('#txtArea');
         const txtId = document.querySelector('#txtId');
+        const selectFaculdade = document.querySelector('#selectFaculdade');
         const btnNovo = document.querySelector('#btnNovo');
         const btnSalvar = document.querySelector('#btnSalvar');
         const btnApagar = document.querySelector('#btnApagar');
@@ -77,6 +82,9 @@
             txtNome.disabled = true;
             txtMatricula.disabled = true;
             txtArea.disabled = true;
+            selectFaculdade.disabled = true;
+            carregarFaculdades();
+            selectFaculdade.selectedIndex = -1;
             btnNovo.disabled = false;
             btnSalvar.disabled = true;
             btnApagar.disabled = true;
@@ -99,13 +107,33 @@
             for (var i = 0; i < n; i++) {
                 var p = professores[i];
                 linhasTabela +=
-                    `<tr><td><a href="javascript:void(0)" onclick="selecionarProfessor('${p.id}','${p.nome}','${p.matricula}','${p.area}')">`
+                    `<tr><td><a href="javascript:void(0)" onclick="selecionarProfessor('${p.id}','${p.nome}','${p.matricula}','${p.area}','${p.faculdade.id}')">`
                     + p.id + '</a></td>' +
                     '<td>' + p.nome + '</td>' +
                     '<td>' + p.matricula + '</td>' +
-                    '<td>' + p.area + '</td></tr>\n';
+                    '<td>' + p.area + '</td>' +
+                    '<td>' + p.faculdade.nome + '</td></tr>\n';
             }
             corpoTabela.innerHTML = linhasTabela;
+        }
+
+        async function carregarFaculdades() {
+            const URL = `/api/faculdades`;
+            fetch(URL)
+                .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; })
+                .then(resposta => resposta.json())
+                .then(jsonResponse => preencherSelectFaculdades(jsonResponse))
+                .catch(function (error) { paragrafoMensagem.innerHTML = "Erro ao carregar faculdades (código " + error.message + ")"; });
+        }
+
+        function preencherSelectFaculdades(faculdades) {
+            var opcoes = '';
+            var n = faculdades.length;
+            for (var i = 0; i < n; i++) {
+                var f = faculdades[i];
+                opcoes += `<option value="${f.id}">${f.nome}</option>`
+            }
+            selectFaculdade.innerHTML = opcoes;
         }
 
         function selecionarProfessor(id, nome, matricula, area, faculdadeId) {
@@ -117,12 +145,14 @@
             txtNome.value = nome;
             txtMatricula.value = matricula;
             txtArea.value = area;
+            selectFaculdade.value = faculdadeId;
             console.log('faculdadeId: ', faculdadeId);
 
             txtId.disabled = true;
             txtNome.disabled = false;
             txtMatricula.disabled = false;
             txtArea.disabled = false;
+            selectFaculdade.disabled = false;
 
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -133,16 +163,19 @@
         function novoProfessor() {
             paragrafoMensagem.innerHTML = 'Preencha os dados do novo professor...';
             criandoNovoProfessor = true;
+            carregarFaculdades();
 
             txtId.value = '';
             txtNome.value = '';
             txtMatricula.value = '';
             txtArea.value = '';
+            selectFaculdade.selectedIndex = -1;
 
             txtId.disabled = true;
             txtNome.disabled = false;
             txtMatricula.disabled = false;
             txtArea.disabled = false;
+            selectFaculdade.disabled = false;
 
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -165,6 +198,9 @@
                 'nome': txtNome.value,
                 'matricula': txtMatricula.value,
                 'area': txtArea.value,
+                'faculdade': {
+                    'id': selectFaculdade.value
+                }
             };
             const postRequest = {
                 method: 'POST',
@@ -186,6 +222,9 @@
                 'nome': txtNome.value,
                 'matricula': txtMatricula.value,
                 'area': txtArea.value,
+                'faculdade': {
+                    'id': selectFaculdade.value
+                }
             };
             const putRequest = {
                 method: 'PUT',
