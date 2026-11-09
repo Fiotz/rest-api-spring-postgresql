@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Disciplinas</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+</head>
+<body>
+    <h1>Gerenciamento de Disciplinas</h1>
+
+    <table>
+        <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+        <tr> <td>Nome:</td> <td><input type="text" id="txtNome"></td> </tr>
+        <tr> <td>Semestre:</td> <td><input type="text" id="txtSemestre"></td> </tr>
+        <tr>
+            <td></td>
+            <td>
+                <input type="button" value="Novo" onclick="novaDisciplina()" id="btnNovo">
+                <input type="button" value="Salvar" onclick="salvarDisciplina()" id="btnSalvar">
+                <input type="button" value="Apagar" onclick="apagarDisciplina()" id="btnApagar">
+                <input type="button" value="Cancelar" onclick="cancelarEdicao()" id="btnCancelar">
+            </td>
+        </tr>
+    </table>
+
+    <p style="font-weight:bold" id="paragrafoMensagem"></p>
+
+    <table>
+        <tr> <th>ID</th> <th>Nome</th> <th>Semestre</th> </tr>
+        <tbody id="corpoTabelaDisciplinas"> </tbody>
+    </table>
+
+    <script>
+        const corpoTabela = document.querySelector('#corpoTabelaDisciplinas');
+        const paragrafoMensagem = document.querySelector('#paragrafoMensagem');
+        const txtNome = document.querySelector('#txtNome');
+        const txtSemestre = document.querySelector('#txtSemestre');
+        const txtId = document.querySelector('#txtId');
+
+        const btnNovo = document.querySelector('#btnNovo');
+        const btnSalvar = document.querySelector('#btnSalvar');
+        const btnApagar = document.querySelector('#btnApagar');
+        const btnCancelar = document.querySelector('#btnCancelar');
+        var criandoNovaDisciplina = false;
+
+        inicializar();
+
+        function inicializar() {
+            criandoNovaDisciplina = false;
+            paragrafoMensagem.innerHTML = 'Pressione o botão Novo ou selecione uma disciplina da lista:'
+            txtId.value = '';
+            txtNome.value = '';
+            txtSemestre.value = '';
+
+            txtId.disabled = true;
+            txtNome.disabled = true;
+            txtSemestre.disabled = true;
+
+            btnNovo.disabled = false;
+            btnSalvar.disabled = true;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = true;
+            listarTodasDisciplinas();
+        }
+
+        async function listarTodasDisciplinas() {
+            const URL = `/api/disciplinas`;
+            fetch(URL)
+                .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; })
+                .then(resposta => resposta.json())
+                .then(jsonResponse => preencherTabela(jsonResponse))
+                .catch(function (error) { paragrafoMensagem.innerHTML = "Erro ao listar disciplinas (código " + error.message + ")"; });
+        }
+
+        function preencherTabela(disciplinas) {
+            var linhasTabela = '';
+            for (var i = 0; i < disciplinas.length; i++) {
+                var d = disciplinas[i];
+                linhasTabela +=
+                    `<tr><td><a href="javascript:void(0)" onclick="selecionarDisciplina('${d.id}','${d.nome}','${d.semestre}')">`
+                    + d.id + '</a></td>' +
+                    '<td>' + d.nome + '</td>' +
+                    '<td>' + d.semestre + '</td></tr>\n';
+            }
+            corpoTabela.innerHTML = linhasTabela;
+        }
+
+        function selecionarDisciplina(id, nome, semestre) {
+            criandoNovaDisciplina = false;
+            paragrafoMensagem.innerHTML = 'Altere e salve os dados da disciplina, ou então apague o registro.'
+            txtId.value = id;
+            txtNome.value = nome;
+            txtSemestre.value = semestre;
+
+            txtId.disabled = true;
+            txtNome.disabled = false;
+            txtSemestre.disabled = false;
+
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = false;
+            btnCancelar.disabled = false;
+        }
+
+        function novaDisciplina() {
+            paragrafoMensagem.innerHTML = 'Preencha os dados da nova disciplina...';
+            criandoNovaDisciplina = true;
+
+            txtId.value = '';
+            txtNome.value = '';
+            txtSemestre.value = '';
+
+            txtId.disabled = true;
+            txtNome.disabled = false;
+            txtSemestre.disabled = false;
+
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = false;
+        }
+
+        function salvarDisciplina() {
+            if (criandoNovaDisciplina) {
+                criarDisciplina();
+            } else {
+                alterarDisciplina();
+            }
+        }
+
+        async function criarDisciplina() {
+            const URL = `/api/disciplinas`;
+            const dadosDisciplina = {
+                'nome': txtNome.value,
+                'semestre': txtSemestre.value
+            };
+            const postRequest = {
+                method: 'POST',
+                body: JSON.stringify(dadosDisciplina),
+                headers: { 'Content-type': 'application/json' }
+            };
+            fetch(URL, postRequest)
+                .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; })
+                .then(resposta => resposta.json())
+                .then(jsonResponse => inicializar())
+                .catch(function (error) { paragrafoMensagem.innerHTML = 'Erro ao criar disciplina (código ' + error.message + ')'; });
+        }
+
+        async function alterarDisciplina() {
+            const ID = txtId.value;
+            const URL = `/api/disciplinas/${ID}`;
+            const dadosDisciplina = {
+                'id': ID,
+                'nome': txtNome.value,
+                'semestre': txtSemestre.value
+            };
+            const putRequest = {
+                method: 'PUT',
+                body: JSON.stringify(dadosDisciplina),
+                headers: { 'Content-type': 'application/json' }
+            };
+            fetch(URL, putRequest)
+                .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; })
+                .then(resposta => resposta.json())
+                .then(jsonResponse => inicializar())
+                .catch(function (error) { paragrafoMensagem.innerHTML = 'Erro ao alterar disciplina (código ' + error.message + ')'; });
+        }
+
+        function cancelarEdicao() {
+            inicializar();
+        }
+
+        async function apagarDisciplina() {
+            const ID = txtId.value;
+            const URL = `/api/disciplinas/${ID}`;
+            const deleteRequest = { method: 'DELETE' };
+            fetch(URL, deleteRequest)
+                .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; })
+                .then(resposta => inicializar())
+                .catch(function (error) { paragrafoMensagem.innerHTML = 'Erro ao apagar disciplina (código ' + error.message + ')'; });
+        }
+    </script>
+</body>
+</html>
